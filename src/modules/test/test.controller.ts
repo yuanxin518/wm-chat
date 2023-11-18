@@ -1,4 +1,4 @@
-import { Controller, Get, Req, Res, Request, Header } from '@nestjs/common';
+import { Controller, Get, Header } from '@nestjs/common';
 import { TestService } from './test.service';
 import Result from 'src/utils/result';
 
