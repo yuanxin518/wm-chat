@@ -1,11 +1,9 @@
-import { Injectable } from '@nestjs/common';
 import { User } from 'src/schemas/User';
 
-@Injectable()
 export class UserService {
   constructor() {}
 
-  private readonly users = [
+  private readonly users: User[] = [
     {
       userId: 1,
       username: 'john',

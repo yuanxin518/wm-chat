@@ -4,6 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import { jwtConstants } from './constant';
 import { RedisClientType } from 'redis';
 import config from 'src/configs/config';
+import { User } from 'src/schemas/User';
 
 @Injectable()
 export class AuthService {
@@ -27,12 +28,8 @@ export class AuthService {
       throw new UnauthorizedException();
     }
 
-    const payload = { userId: user.userId, userName: user.username };
+    const payload = user;
 
-    // 判断是否已经登录
-    if (await this.checkUserIsLogin(username)) {
-      return '已经登录，不能重复登录';
-    }
     const access_token = await this.jwtService.signAsync(payload, {
       secret: jwtConstants.secret,
     });
@@ -47,12 +44,21 @@ export class AuthService {
     };
   }
 
-  /** 检查缓存是否已经存在登录的用户 */
-  async checkUserIsLogin(username: string): Promise<any> {
-    const token = await this.redisClient.get(username);
-    if (token) {
-      return true;
+  /**
+   * 校验token是否正常，并且处于登录状态
+   * @param token
+   */
+  async varifyLoginByToken(token: string) {
+    const data = this.jwtService.decode(token) as User;
+
+    if (!data.username) {
+      return false;
     }
-    return false;
+    const existentToken = await this.redisClient.get(data.username);
+
+    if (existentToken !== token) {
+      return false;
+    }
+    return true;
   }
 }
