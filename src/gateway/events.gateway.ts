@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import {
   ConnectedSocket,
   MessageBody,
@@ -22,13 +23,21 @@ import { WebSocket } from 'ws';
 export class WsGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private jwtService: JwtService,
+  ) {}
   connectedClient = new ConnectedClient();
 
   afterInit(server: any) {
     server;
   }
 
+  /**
+   * 处理连接，其中检查是否头部有websocket和token的标识内容，并在校验token成功后通过
+   * @param client
+   * @param request
+   */
   async handleConnection(client: Socket, request: IncomingMessage) {
     const { headers } = request;
     const authToken =
@@ -48,20 +57,23 @@ export class WsGateway
   }
 
   @SubscribeMessage('join')
-  hello(
-    @MessageBody() data: { test: string; token: string },
+  join(
+    @MessageBody()
+    data: { test: string; token: string },
     @ConnectedSocket() client: WebSocket,
   ): any {
     const { token } = data;
+    const { userId } = this.jwtService.decode(token) || {};
 
-    this.connectedClient.addClient(token, client);
+    if (!userId) return;
+    this.connectedClient.addClient(userId, client);
 
     return {
       event: 'hello',
       data: {
         count: this.connectedClient.getAllCount(),
       },
-      msg: 'rustfisher.com',
+      msg: '',
     };
   }
 }
