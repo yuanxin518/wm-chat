@@ -76,4 +76,25 @@ export class WsGateway
       msg: '',
     };
   }
+
+  @SubscribeMessage('send-msg')
+  sendMsg(
+    @MessageBody()
+    data: {
+      targetUserId: number;
+      msg: string;
+      token: string;
+    },
+  ): any {
+    const { targetUserId, msg, token } = data;
+
+    const { userId } = this.jwtService.decode(token);
+    if (!userId) return;
+
+    this.connectedClient.sendMessageToUser(userId, targetUserId, msg);
+
+    return {
+      msg: '发送成功',
+    };
+  }
 }

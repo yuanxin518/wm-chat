@@ -26,10 +26,17 @@ export class ConnectedClient {
   }
 
   // 向指定用户发送聊天
-  sendMessageToUser(userId: number, message: string) {
-    const user = this.connectedClients.get(userId);
-    if (!user) return;
-    user.send(message);
+  sendMessageToUser(userId: number, targetUserId: number, message: string) {
+    console.log(targetUserId);
+    const targetUser = this.connectedClients.get(targetUserId);
+    if (!userId) return;
+
+    targetUser.send(
+      JSON.stringify({
+        user: userId,
+        msg: message,
+      }),
+    );
   }
 
   // 向聊天室所有人发送信息
