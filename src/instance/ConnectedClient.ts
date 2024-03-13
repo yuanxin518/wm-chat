@@ -7,12 +7,20 @@ export class ConnectedClient {
 
   // 接入客户端
   addClient(userId: number, client: WebSocket) {
+    client.addListener('close', () => {
+      this.removeClient(userId);
+    });
+
     this.connectedClients.set(userId, client);
+    console.log(`userId: ${userId} 的用户与聊天室建立连接`);
   }
 
   // 移除客户端
   removeClient(userId: number) {
-    this.connectedClients.delete(userId);
+    if (this.connectedClients.has(userId)) {
+      this.connectedClients.delete(userId);
+      console.log(`userId: ${userId} 的用户断开聊天室连接`);
+    }
   }
 
   // 获取连接总数
