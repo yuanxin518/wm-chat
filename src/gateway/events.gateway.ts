@@ -56,6 +56,12 @@ export class WsGateway
     client;
   }
 
+  /**
+   * 加入聊天室
+   * @param data
+   * @param client
+   * @returns
+   */
   @SubscribeMessage('join')
   join(
     @MessageBody()
@@ -77,6 +83,11 @@ export class WsGateway
     };
   }
 
+  /**
+   * 发送私聊信息
+   * @param data
+   * @returns
+   */
   @SubscribeMessage('send-msg')
   sendMsg(
     @MessageBody()
@@ -93,6 +104,38 @@ export class WsGateway
 
     this.connectedClient.sendMessageToUser(userId, targetUserId, msg);
 
+    return {
+      msg: '发送成功',
+    };
+  }
+
+  /**
+   * 发送群聊信息
+   * @param data
+   * @returns
+   */
+  @SubscribeMessage('send-group')
+  sendGroupMsg(
+    @MessageBody()
+    data: {
+      targetGroupId: number;
+      msg: string;
+      token: string;
+    },
+  ): any {
+    const { targetGroupId, msg, token } = data;
+
+    const { userId } = this.jwtService.decode(token);
+    if (!userId) {
+      console.log('用户不存在，发送失败');
+      return;
+    }
+
+    if (!targetGroupId) {
+      console.log('未指定群聊id，发送失败');
+      return;
+    }
+    this.connectedClient.sendMessageToGroup(targetGroupId, msg);
     return {
       msg: '发送成功',
     };

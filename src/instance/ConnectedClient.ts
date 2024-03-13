@@ -42,9 +42,14 @@ export class ConnectedClient {
   }
 
   // 向聊天室所有人发送信息
-  sendMessageToAll(message: string) {
+  sendMessageToGroup(groupId: number, message: string) {
     this.connectedClients.forEach((client) => {
-      client.send(message);
+      client.send(
+        JSON.stringify({
+          groupId,
+          message,
+        }),
+      );
     });
   }
 }
