@@ -43,6 +43,7 @@ export class ConnectedClient {
 
     targetUser.send(
       JSON.stringify({
+        EVENT: 'RECEIVE_MSG',
         user: userId,
         msg: message,
       }),
@@ -54,6 +55,7 @@ export class ConnectedClient {
     this.connectedClients.forEach((client) => {
       client.send(
         JSON.stringify({
+          EVENT: 'RECEIVE_GROUP_MSG',
           groupId,
           message,
         }),

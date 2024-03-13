@@ -48,6 +48,7 @@ export class WsGateway
       if (!(await this.authService.varifyLoginByToken(authToken))) {
         client.send(
           JSON.stringify({
+            event: 'AUTH_FAIL',
             success: false,
             message: '没有登录，请重新登录',
           }),
@@ -60,6 +61,7 @@ export class WsGateway
 
     client.send(
       JSON.stringify({
+        event: 'AUTH_SUCCESS',
         success: true,
         message: '建立连接成功',
       }),
@@ -89,7 +91,7 @@ export class WsGateway
     this.connectedClient.addClient(userId, client);
 
     return {
-      event: 'hello',
+      event: 'JOIN',
       data: {
         count: this.connectedClient.getAllCount(),
       },
@@ -118,9 +120,7 @@ export class WsGateway
 
     this.connectedClient.sendMessageToUser(userId, targetUserId, msg);
 
-    return {
-      msg: '发送成功',
-    };
+    return { event: 'SEND_MSG', msg: '发送成功' };
   }
 
   /**
@@ -151,6 +151,7 @@ export class WsGateway
     }
     this.connectedClient.sendMessageToGroup(targetGroupId, msg);
     return {
+      event: 'SEND_GROUP',
       msg: '发送成功',
     };
   }
