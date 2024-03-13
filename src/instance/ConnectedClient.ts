@@ -27,9 +27,11 @@ export class ConnectedClient {
 
   // 向指定用户发送聊天
   sendMessageToUser(userId: number, targetUserId: number, message: string) {
-    console.log(targetUserId);
     const targetUser = this.connectedClients.get(targetUserId);
-    if (!userId) return;
+
+    if (targetUserId && !targetUser) console.warn(`${targetUserId}未加入`);
+
+    if (!targetUser) return;
 
     targetUser.send(
       JSON.stringify({
