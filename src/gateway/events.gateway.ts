@@ -40,16 +40,30 @@ export class WsGateway
    */
   async handleConnection(client: Socket, request: IncomingMessage) {
     const { headers } = request;
+
     const authToken =
       headers['sec-websocket-protocol'] || (headers[config.TOKEN] as string);
 
     try {
       if (!(await this.authService.varifyLoginByToken(authToken))) {
+        client.send(
+          JSON.stringify({
+            success: false,
+            message: '没有登录，请重新登录',
+          }),
+        );
         client.close();
       }
     } catch (error) {
       client.close();
     }
+
+    client.send(
+      JSON.stringify({
+        success: true,
+        message: '建立连接成功',
+      }),
+    );
   }
 
   handleDisconnect(client: any) {
