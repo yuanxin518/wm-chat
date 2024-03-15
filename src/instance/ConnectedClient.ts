@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto';
 import { WebSocket } from 'ws';
 
 export class ConnectedClient {
@@ -40,6 +41,7 @@ export class ConnectedClient {
     message: string,
   ) {
     const targetUser = this.connectedClients.get(targetUserId);
+    const user = this.connectedClients.get(userId);
 
     if (targetUserId && !targetUser) console.warn(`${targetUserId}未加入`);
 
@@ -47,8 +49,28 @@ export class ConnectedClient {
 
     targetUser.send(
       JSON.stringify({
-        EVENT: 'RECEIVE_MSG',
-        user: userId,
+        event: 'RECEIVE_MSG',
+        data: {
+          id: randomUUID(),
+          userId,
+          targetUserId,
+          msg: message,
+          self: false,
+        },
+        msg: message,
+      }),
+    );
+
+    user.send(
+      JSON.stringify({
+        event: 'SEND_MSG_SUCCESS',
+        data: {
+          id: randomUUID(),
+          userId,
+          targetUserId,
+          msg: message,
+          self: true,
+        },
         msg: message,
       }),
     );
@@ -60,9 +82,11 @@ export class ConnectedClient {
     this.connectedClients.forEach((client) => {
       client.send(
         JSON.stringify({
-          EVENT: 'RECEIVE_GROUP_MSG',
-          groupId,
-          message,
+          event: 'RECEIVE_GROUP_MSG',
+          data: {
+            groupId,
+          },
+          msg: message,
         }),
       );
     });

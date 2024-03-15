@@ -52,7 +52,7 @@ export class WsGateway
           JSON.stringify({
             event: 'AUTH_FAIL',
             success: false,
-            message: '没有登录，请重新登录',
+            msg: '没有登录，请重新登录',
           }),
         );
         client.close();
@@ -65,7 +65,7 @@ export class WsGateway
       JSON.stringify({
         event: 'AUTH_SUCCESS',
         success: true,
-        message: '建立连接成功',
+        msg: '建立连接成功',
       }),
     );
   }
