@@ -5,23 +5,21 @@ import { AuthController } from './auth.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './constant';
 import { RedisModule } from 'src/lib/redis.module';
-import { MongooseModule } from '@nestjs/mongoose';
-import { User, UserSchema } from 'src/schemas/User';
-import { UserService } from '../user/user.service';
+import { MessageModule } from '../message/message.module';
+import { UsersModule } from '../user/user.module';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([
-      { schema: UserSchema, name: User.name, collection: 'wmchat' },
-    ]),
     JwtModule.register({
       global: true,
       secret: jwtConstants.secret,
       signOptions: { expiresIn: '60s' },
     }),
     RedisModule,
+    MessageModule,
+    UsersModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, UserService],
+  providers: [AuthService],
 })
 export class AuthModule {}

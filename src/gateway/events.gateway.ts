@@ -15,6 +15,7 @@ import config from 'src/configs/config';
 
 import { ConnectedClient } from 'src/instance/ConnectedClient';
 import { AuthService } from 'src/modules/auth/auth.service';
+import { MessageService } from 'src/modules/message/message.service';
 
 import { WebSocket } from 'ws';
 
@@ -24,6 +25,7 @@ export class WsGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
   constructor(
+    private readonly messageService: MessageService,
     private readonly authService: AuthService,
     private jwtService: JwtService,
   ) {}
@@ -79,13 +81,13 @@ export class WsGateway
    * @returns
    */
   @SubscribeMessage('join')
-  join(
+  async join(
     @MessageBody()
     data: { test: string; token: string },
     @ConnectedSocket() client: WebSocket,
-  ): any {
+  ) {
     const { token } = data;
-    const { userId } = this.jwtService.decode(token) || {};
+    const { userId } = (await this.jwtService.decode(token)) || {};
 
     if (!userId) return;
     this.connectedClient.addClient(userId, client);
@@ -105,21 +107,27 @@ export class WsGateway
    * @returns
    */
   @SubscribeMessage('send-msg')
-  sendMsg(
+  async sendMsg(
     @MessageBody()
     data: {
       targetUserId: number;
       msg: string;
       token: string;
     },
-  ): any {
+  ) {
     const { targetUserId, msg, token } = data;
 
-    const { userId } = this.jwtService.decode(token);
+    const { userId } = await this.jwtService.decode(token);
+
     if (!userId) return;
 
-    this.connectedClient.sendMessageToUser(userId, targetUserId, msg);
-
+    const res = await this.connectedClient.sendMessageToUser(
+      userId,
+      targetUserId,
+      msg,
+    );
+    if (res) {
+    }
     return { event: 'SEND_MSG', msg: '发送成功' };
   }
 

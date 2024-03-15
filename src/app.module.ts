@@ -7,12 +7,14 @@ import config from './configs/config';
 import { AuthService } from './modules/auth/auth.service';
 import { UsersModule } from './modules/user/user.module';
 import { JwtService } from '@nestjs/jwt';
+import { MessageModule } from './modules/message/message.module';
 
 @Module({
   imports: [
     TestModule,
     AuthModule,
     UsersModule,
+    MessageModule,
     MongooseModule.forRoot(config.MONGODB_URI),
   ],
   providers: [WsGateway, AuthService, JwtService],

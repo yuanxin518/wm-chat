@@ -27,17 +27,22 @@ export class AuthService {
 
     const exception = new UnauthorizedException();
 
-    if (!user) {
+    if (!user || !user.username) {
       exception.message = '账号不存在';
       throw exception;
     }
+
     if (user?.password !== password) {
       const exception = new UnauthorizedException();
       exception.message = '密码不正确';
       throw exception;
     }
 
-    const payload = user;
+    const payload = {
+      userId: user.userId,
+      username: user.username,
+      password: user.password,
+    };
 
     const access_token = await this.jwtService.signAsync(payload, {
       secret: jwtConstants.secret,
@@ -49,7 +54,31 @@ export class AuthService {
     });
 
     return {
+      success: true,
       access_token,
+    };
+  }
+
+  async signUp(username: string, password: string) {
+    let success = false;
+    const isExist = await this.userService.findOne(username);
+    if (isExist) {
+      return {
+        success,
+        message: '账号已存在',
+      };
+    }
+    const res = await this.userService.createOne(username, password);
+    if (!res) {
+      return {
+        success,
+        message: '注册时出现异常',
+      };
+    }
+
+    success = true;
+    return {
+      success: true,
     };
   }
 

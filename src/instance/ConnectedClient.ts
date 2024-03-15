@@ -34,7 +34,11 @@ export class ConnectedClient {
   }
 
   // 向指定用户发送聊天
-  sendMessageToUser(userId: number, targetUserId: number, message: string) {
+  async sendMessageToUser(
+    userId: number,
+    targetUserId: number,
+    message: string,
+  ) {
     const targetUser = this.connectedClients.get(targetUserId);
 
     if (targetUserId && !targetUser) console.warn(`${targetUserId}未加入`);
@@ -48,6 +52,7 @@ export class ConnectedClient {
         msg: message,
       }),
     );
+    return true;
   }
 
   // 向聊天室所有人发送信息
