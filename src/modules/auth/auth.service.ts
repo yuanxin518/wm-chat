@@ -25,8 +25,16 @@ export class AuthService {
   async signIn(username: string, password: string): Promise<any> {
     const user = await this.userService.findOne(username);
 
+    const exception = new UnauthorizedException();
+
+    if (!user) {
+      exception.message = '账号不存在';
+      throw exception;
+    }
     if (user?.password !== password) {
-      throw new UnauthorizedException();
+      const exception = new UnauthorizedException();
+      exception.message = '密码不正确';
+      throw exception;
     }
 
     const payload = user;

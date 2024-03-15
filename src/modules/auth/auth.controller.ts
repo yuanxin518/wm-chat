@@ -19,7 +19,16 @@ export class AuthController {
   @Post('login')
   @ApiOperation({ summary: '登录' })
   signIn(@Body() signInDto: User) {
-    return this.authService.signIn(signInDto.username, signInDto.password);
+    let res = null;
+    try {
+      res = this.authService.signIn(signInDto.username, signInDto.password);
+      return res;
+    } catch (err) {
+      console.log(err);
+    }
+    return {
+      success: false,
+    };
   }
 
   @UseGuards(AuthGuard)
