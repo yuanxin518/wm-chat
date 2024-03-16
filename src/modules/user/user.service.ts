@@ -21,7 +21,22 @@ export class UserService {
     };
   }
 
+  async findOneById(id: string): Promise<User | undefined> {
+    const res = await this.userModel.findById(id);
+    if (!res) return null;
+
+    return {
+      userId: res._id.toString(),
+      username: res.username,
+      password: res.password,
+    };
+  }
+
   async createOne(username: string, password: string) {
     return await this.userModel.create({ username, password });
+  }
+
+  async findAll() {
+    return await this.userModel.find();
   }
 }

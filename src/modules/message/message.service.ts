@@ -12,4 +12,13 @@ export class MessageService {
   async saveMsg(message: Message) {
     return await this.MessageModel.create(message);
   }
+
+  async getMsgDetail(message: Message) {
+    return await this.MessageModel.find({
+      $or: [
+        { targetUserId: message.targetUserId, sendUserId: message.sendUserId },
+        { targetUserId: message.sendUserId, sendUserId: message.targetUserId },
+      ],
+    }).exec();
+  }
 }

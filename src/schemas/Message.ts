@@ -6,6 +6,11 @@ export type MessageDocument = HydratedDocument<Message>;
 
 @Schema()
 export class Message {
+  constructor(userId: string, targetUserId: string) {
+    this.sendUserId = userId;
+    this.targetUserId = targetUserId;
+  }
+  
   @Prop()
   sendUserId: string;
 
@@ -14,6 +19,9 @@ export class Message {
 
   @Prop()
   messageContent: string;
+
+  @Prop()
+  time: string;
 }
 
 export const MessageSchema = SchemaFactory.createForClass(Message);

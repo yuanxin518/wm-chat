@@ -4,10 +4,10 @@ import { WebSocket } from 'ws';
 export class ConnectedClient {
   constructor() {}
 
-  private connectedClients: Map<number, WebSocket> = new Map();
+  private connectedClients: Map<string, WebSocket> = new Map();
 
   // 接入客户端
-  addClient(userId: number, client: WebSocket) {
+  addClient(userId: string, client: WebSocket) {
     client.addListener('close', () => {
       this.removeClient(userId);
     });
@@ -17,7 +17,7 @@ export class ConnectedClient {
   }
 
   // 移除客户端
-  removeClient(userId: number) {
+  removeClient(userId: string) {
     if (this.connectedClients.has(userId)) {
       this.connectedClients.delete(userId);
       console.log(`userId: ${userId} 的用户断开聊天室连接`);
@@ -30,14 +30,14 @@ export class ConnectedClient {
   }
 
   // 根据userId获取已存在的连接
-  getClientById(userId: number): WebSocket | undefined {
+  getClientById(userId: string): WebSocket | undefined {
     return this.connectedClients.get(userId);
   }
 
   // 向指定用户发送聊天
   async sendMessageToUser(
-    userId: number,
-    targetUserId: number,
+    userId: string,
+    targetUserId: string,
     message: string,
   ) {
     const targetUser = this.connectedClients.get(targetUserId);
@@ -45,21 +45,23 @@ export class ConnectedClient {
 
     if (targetUserId && !targetUser) console.warn(`${targetUserId}未加入`);
 
-    if (!targetUser) return;
-
-    targetUser.send(
-      JSON.stringify({
-        event: 'RECEIVE_MSG',
-        data: {
-          id: randomUUID(),
-          userId,
-          targetUserId,
+    const time = new Date().toLocaleString();
+    if (targetUser) {
+      targetUser.send(
+        JSON.stringify({
+          event: 'RECEIVE_MSG',
+          data: {
+            id: randomUUID(),
+            userId,
+            targetUserId,
+            msg: message,
+            self: false,
+            time: time,
+          },
           msg: message,
-          self: false,
-        },
-        msg: message,
-      }),
-    );
+        }),
+      );
+    }
 
     user.send(
       JSON.stringify({
@@ -70,11 +72,19 @@ export class ConnectedClient {
           targetUserId,
           msg: message,
           self: true,
+          time: time,
         },
         msg: message,
       }),
     );
-    return true;
+
+    return {
+      id: randomUUID(),
+      userId,
+      targetUserId,
+      msg: message,
+      time: time,
+    };
   }
 
   // 向聊天室所有人发送信息

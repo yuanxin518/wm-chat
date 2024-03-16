@@ -110,7 +110,7 @@ export class WsGateway
   async sendMsg(
     @MessageBody()
     data: {
-      targetUserId: number;
+      targetUserId: string;
       msg: string;
       token: string;
     },
@@ -127,6 +127,12 @@ export class WsGateway
       msg,
     );
     if (res) {
+      this.messageService.saveMsg({
+        sendUserId: res.userId,
+        targetUserId: res.targetUserId,
+        messageContent: res.msg,
+        time: res.time,
+      });
     }
     return { event: 'SEND_MSG', msg: '发送成功' };
   }

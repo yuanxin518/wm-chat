@@ -1,14 +1,6 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Post,
-  Request,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 
 import { AuthService } from './auth.service';
-import { AuthGuard } from './auth.guard';
 
 import { ApiOperation } from '@nestjs/swagger';
 import { MessageService } from '../message/message.service';
@@ -41,12 +33,5 @@ export class AuthController {
     } catch (err) {
       throw err;
     }
-  }
-
-  @UseGuards(AuthGuard)
-  @ApiOperation({ summary: '获取登录的用户信息' })
-  @Get('profile')
-  getProfile(@Request() req) {
-    return req.user;
   }
 }
