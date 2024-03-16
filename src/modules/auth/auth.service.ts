@@ -44,6 +44,14 @@ export class AuthService {
       password: user.password,
     };
 
+    const existToken = await this.redisClient.get(user.username);
+
+    if (existToken) {
+      return {
+        success: true,
+        access_token: existToken,
+      };
+    }
     const access_token = await this.jwtService.signAsync(payload, {
       secret: jwtConstants.secret,
     });
