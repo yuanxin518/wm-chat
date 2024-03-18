@@ -21,4 +21,10 @@ export class MessageService {
       ],
     }).exec();
   }
+
+  async getAllMsg(userId: string) {
+    return await this.MessageModel.find({
+      $or: [{ targetUserId: userId }, { sendUserId: userId }],
+    }).exec();
+  }
 }

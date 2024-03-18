@@ -37,4 +37,17 @@ export class MessageController {
       data: msgList,
     };
   }
+
+  @Post('allMsg')
+  async allMsg(@Req() req: Request) {
+    const token = req.headers['wm-chat-token'];
+    const { username } = await this.jwtService.decode(token);
+    const user = await this.userSerice.findOne(username);
+    const msg = await this.messageService.getAllMsg(user.userId);
+
+    return {
+      success: true,
+      data: msg.map((item) => item.messageContent),
+    };
+  }
 }

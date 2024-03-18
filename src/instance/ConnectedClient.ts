@@ -11,6 +11,16 @@ export class ConnectedClient {
     client.addListener('close', () => {
       this.removeClient(userId);
     });
+    setInterval(() => {
+      client.send(
+        JSON.stringify({
+          event: 'PING',
+          data: {
+            count: this.connectedClients.size,
+          },
+        }),
+      );
+    }, 3000);
 
     this.connectedClients.set(userId, client);
     console.log(`userId: ${userId} 的用户与聊天室建立连接`);
